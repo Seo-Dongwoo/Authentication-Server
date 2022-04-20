@@ -36,23 +36,27 @@ router.post("/register", async (req, res) => {
 
 // 로그인
 router.post("/login", async (req, res) => {
-  // 유효성 검사해서 오류 검사
-  const { error } = loginValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  try {
+    // 유효성 검사해서 오류 검사
+    const { error } = loginValidation(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
 
-  // 이미 이메일 존재하는지 여부 체크
-  const user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send("Email을 찾을 수 없습니다.");
+    // 이미 이메일 존재하는지 여부 체크
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) return res.status(400).send("Email을 찾을 수 없습니다.");
 
-  // password가 옳을 경우
-  const validPass = await bcrypt.compare(req.body.password, user.password);
-  if (!validPass) return res.status(400).send("유효하지 않은 password");
+    // password가 옳을 경우
+    const validPass = await bcrypt.compare(req.body.password, user.password);
+    if (!validPass) return res.status(400).send("유효하지 않은 password");
 
-  // 토큰 생성 및 할당
-  const token = jwt.sign({ _id: user._id }, process.env.TOKEN);
-  res.header("auth-token", token).send(token);
+    // 토큰 생성 및 할당
+    const token = jwt.sign({ _id: user._id }, process.env.TOKEN);
+    res.header("auth-token", token).send(token);
 
-  res.send("로그인 성공!");
+    res.status(200).status({ data: token, message: "로그인 성공" });
+  } catch (error) {
+    res.status(500).send({ message: "서버 에러" });
+  }
 });
 
 module.exports = router;
