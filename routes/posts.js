@@ -23,6 +23,7 @@ router.get("/:postId", async (req, res) => {
 // Post 생성
 router.post("/", async (req, res) => {
   const post = new Post({
+    name: req.body.name,
     title: req.body.title,
     description: req.body.description,
   });
@@ -35,11 +36,17 @@ router.post("/", async (req, res) => {
 });
 
 // Post 업데이트
-router.patch("/:postId", async (req, res) => {
+router.put("/:postId", async (req, res) => {
   try {
     const updatedPost = await Post.updateOne(
       { _id: req.params.postId },
-      { $set: { title: req.body.title } }
+      {
+        $set: {
+          title: req.body.title,
+          name: req.body.name,
+          description: req.body.description,
+        },
+      }
     );
     res.json(updatedPost);
   } catch (err) {
@@ -50,7 +57,7 @@ router.patch("/:postId", async (req, res) => {
 // Post 삭제
 router.delete("/:postId", async (req, res) => {
   try {
-    const removedPost = await Post.remove({ _id: req.params.postId });
+    const removedPost = await Post.deleteOne({ _id: req.params.postId });
     res.json(removedPost);
   } catch (err) {
     res.json({ message: err });
