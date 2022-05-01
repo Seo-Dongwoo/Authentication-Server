@@ -11,9 +11,9 @@ router.get("/", async (req, res) => {
 });
 
 // 특정 Post 가져오기
-router.get("/:postId", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
-    const post = await Post.findById(req.params.postId);
+    const post = await Post.findById(req.params.id);
     res.json(post);
   } catch (err) {
     res.json({ message: err });
@@ -36,14 +36,14 @@ router.post("/", async (req, res) => {
 });
 
 // Post 업데이트
-router.put("/:postId", async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
-    const updatedPost = await Post.updateOne(
-      { _id: req.params.postId },
+    const updatedPost = await Post.findByIdAndUpdate(
+      { _id: req.params.id },
       {
         $set: {
-          title: req.body.title,
           name: req.body.name,
+          title: req.body.title,
           description: req.body.description,
         },
       }
@@ -55,9 +55,11 @@ router.put("/:postId", async (req, res) => {
 });
 
 // Post 삭제
-router.delete("/:postId", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
-    const removedPost = await Post.deleteOne({ _id: req.params.postId });
+    const removedPost = await Post.findByIdAndDelete({
+      _id: req.params.id,
+    });
     res.json(removedPost);
   } catch (err) {
     res.json({ message: err });
